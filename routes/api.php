@@ -1,23 +1,30 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/products', function(){
-    return Product::all();
-});
+use App\Http\Controllers\ProductController;
 
 
-Route::post('/products', function(){
-    return Product::create([
-        'name' => 'Product One',
-        'slug' => 'proudct-1',
-        'description' => 'This is product one',
-        'price' => '99.99'
-    ]);
-});
 
-Route::get('/products', function(){
-    return 'Products';
+// Public Route
+// resource is all in one route.
+// Route::resource('products', ProductController::class);
+
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/search/{name}', [ProductController::class, 'search']);
+
+
+
+// Protected Routes
+Route::group(['middleware' => ['auth:sanctum']],function(){
+    Route::post('/products', [ProductController::class, 'store']);
+    Route::put('/products/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
